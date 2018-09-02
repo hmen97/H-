@@ -73,4 +73,18 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   		assert_redirected_to root_url
   	end
 
+  	test "only show profiles of activated users" do
+  		log_in_as(@user)
+  		get users_path
+  		assert_template 'users/index'
+  		assert_select 'div.pagination'
+  		my_test_users = assigns(:users)
+  		x = my_test_users.total_pages
+  		for i in (1..x)
+  			page_of_users = User.paginate(page: i)
+  			page_of_users.each do |user|
+    			assert_equal true, user.activated?
+  			end
+		end
+	end
 end
